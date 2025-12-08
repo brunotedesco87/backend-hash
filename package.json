@@ -1,0 +1,17 @@
+{
+  "name": "backend-hash",
+  "version": "1.0.0",
+  "description": "Backend para generar hash de imágenes",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "image-hash": "^7.0.1",
+    "multer": "^2.0.2"
+  }
+}
