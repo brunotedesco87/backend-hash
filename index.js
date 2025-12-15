@@ -1,39 +1,47 @@
-const express = require('express');
-const multer = require('multer');
-const { imageHash } = require('image-hash');
-const fs = require('fs');
+import express from 'express';
+import multer from 'multer';
+import fs from 'fs';
+import crypto from 'crypto';
+import cors from 'cors';
 
-const app = express();
+const app = express(); // ✅ PRIMERO se inicializa app
 
+app.use(cors());
+app.use(express.json());
+
+// 🔹 ENDPOINT DE PRUEBA (AHORA SÍ está bien ubicado)
 app.get('/', (req, res) => {
   res.send('HASH BACKEND OK');
 });
 
+// 🔹 Multer config
 const upload = multer({ dest: 'uploads/' });
 
-// Habilitar CORS
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-});
+// 🔹 Función de hash
+function generarHash(buffer) {
+  return crypto.createHash('sha256').update(buffer).digest('hex');
+}
 
-app.post('/hash', upload.single('image'), (req, res) => {
-  const filePath = req.file.path;
-
-  imageHash(filePath, 8, true, (error, data) => {
-    fs.unlinkSync(filePath);
-
-    if (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Error al calcular hash' });
+// 🔹 ENDPOINT REAL
+app.post('/hash', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image received' });
     }
 
-    res.json({ hash: data });
-  });
+    const buffer = fs.readFileSync(req.file.path);
+    const hash = generarHash(buffer);
+
+    fs.unlinkSync(req.file.path);
+
+    res.json({ hash });
+  } catch (error) {
+    console.error('Error generando hash:', error);
+    res.status(500).json({ error: 'Error generating hash' });
+  }
 });
 
-// Puerto dinámico para hosting
+// 🔹 Arranque del servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor de hash corriendo en puerto ${PORT}`);
