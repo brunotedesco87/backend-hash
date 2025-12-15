@@ -1,3 +1,5 @@
+console.log('>>> BACKEND HASH VERSION 2025-DEPLOY-TEST <<<');
+
 import express from 'express';
 import multer from 'multer';
 import fs from 'fs';
