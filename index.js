@@ -1,8 +1,8 @@
 import express from 'express';
 import multer from 'multer';
 import fs from 'fs';
-import crypto from 'crypto';
 import cors from 'cors';
+import { imageHash } from 'image-hash';
 
 const app = express(); // ✅ PRIMERO se inicializa app
 
@@ -17,11 +17,6 @@ app.get('/', (req, res) => {
 // 🔹 Multer config
 const upload = multer({ dest: 'uploads/' });
 
-// 🔹 Función de hash
-function generarHash(buffer) {
-  return crypto.createHash('sha256').update(buffer).digest('hex');
-}
-
 // 🔹 ENDPOINT REAL
 app.post('/hash', upload.single('image'), async (req, res) => {
   try {
@@ -29,12 +24,18 @@ app.post('/hash', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'No image received' });
     }
 
-    const buffer = fs.readFileSync(req.file.path);
-    const hash = generarHash(buffer);
+    imageHash(req.file.path, 16, true, (error, hash) => {
+      fs.unlinkSync(req.file.path);
 
-    fs.unlinkSync(req.file.path);
+      if (error) {
+        console.error("Error generando pHash:", error);
+        return res.status(500).json({ error: "Error generating pHash" });
+      }
 
-    res.json({ hash });
+      // hash es un string binario perceptual
+      res.json({ hash });
+    });
+
   } catch (error) {
     console.error('Error generando hash:', error);
     res.status(500).json({ error: 'Error generating hash' });
