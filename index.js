@@ -1,5 +1,3 @@
-console.log('>>> BACKEND HASH VERSION 2025-DEPLOY-TEST <<<');
-
 import express from 'express';
 import multer from 'multer';
 import fs from 'fs';
@@ -46,5 +44,4 @@ app.post('/hash', upload.single('image'), async (req, res) => {
 // 🔹 Arranque del servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor de hash corriendo en puerto ${PORT}`);
 });
