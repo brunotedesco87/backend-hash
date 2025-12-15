@@ -1,14 +1,14 @@
-app.get('/', (req, res) => {
-  res.send('HASH BACKEND OK');
-});
-
-
 const express = require('express');
 const multer = require('multer');
 const { imageHash } = require('image-hash');
 const fs = require('fs');
 
 const app = express();
+
+app.get('/', (req, res) => {
+  res.send('HASH BACKEND OK');
+});
+
 const upload = multer({ dest: 'uploads/' });
 
 // Habilitar CORS
